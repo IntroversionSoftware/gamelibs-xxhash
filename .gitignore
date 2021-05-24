@@ -59,6 +59,7 @@ tests/unicode_test*
 *.swp
 .vscode/
 .vs/
+*.user
 
 # Doxygen
 doxygen/
