@@ -789,8 +789,8 @@ XXH3_64bits_update_dispatch(XXH_NOESCAPE XXH3_state_t* state, XXH_NOESCAPE const
 /*! @cond Doxygen ignores this part */
 
 static XXH128_hash_t
-XXH3_hashLong_128b_defaultSecret_selection(const void* input, size_t len,
-                                           XXH64_hash_t seed64, const void* secret, size_t secretLen)
+XXH3_hashLong_128b_defaultSecret_selection(const void* XXH_RESTRICT input, size_t len,
+                                           XXH64_hash_t seed64, const void* XXH_RESTRICT secret, size_t secretLen)
 {
     (void)seed64; (void)secret; (void)secretLen;
     if (XXH_DISPATCH_MAYBE_NULL && XXH_g_dispatch128.hashLong128_default == NULL)
@@ -804,8 +804,8 @@ XXH128_hash_t XXH3_128bits_dispatch(XXH_NOESCAPE const void* input, size_t len)
 }
 
 static XXH128_hash_t
-XXH3_hashLong_128b_withSeed_selection(const void* input, size_t len,
-                                      XXH64_hash_t seed64, const void* secret, size_t secretLen)
+XXH3_hashLong_128b_withSeed_selection(const void* XXH_RESTRICT input, size_t len,
+                                      XXH64_hash_t seed64, const void* XXH_RESTRICT secret, size_t secretLen)
 {
     (void)secret; (void)secretLen;
     if (XXH_DISPATCH_MAYBE_NULL && XXH_g_dispatch128.hashLong128_seed == NULL)
