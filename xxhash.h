@@ -1001,7 +1001,7 @@ struct XXH64_state_s {
    XXH64_hash_t reserved64;   /*!< Reserved field. Do not read or write to it, it may be removed. */
 };   /* typedef'd to XXH64_state_t */
 
-#if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)   /* C11+ */
+#if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) && !defined(_MSC_VER)   /* C11+ */
 #  include <stdalign.h>
 #  define XXH_ALIGN(n)      alignas(n)
 #elif defined(__GNUC__)
@@ -4480,8 +4480,8 @@ XXH3_hashLong_64b_withSeed_internal(const void* input, size_t len,
  * It's important for performance that XXH3_hashLong is not inlined.
  */
 XXH_NO_INLINE XXH64_hash_t
-XXH3_hashLong_64b_withSeed(const void* input, size_t len,
-                           XXH64_hash_t seed, const xxh_u8* secret, size_t secretLen)
+XXH3_hashLong_64b_withSeed(const void* XXH_RESTRICT input, size_t len,
+                           XXH64_hash_t seed, const xxh_u8* XXH_RESTRICT secret, size_t secretLen)
 {
     (void)secret; (void)secretLen;
     return XXH3_hashLong_64b_withSeed_internal(input, len, seed,
