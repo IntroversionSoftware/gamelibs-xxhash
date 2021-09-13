@@ -52,9 +52,7 @@
 extern "C" {
 #endif
 
-#if !(defined(__x86_64__) || defined(__i386__) || defined(_M_IX86) || defined(_M_X64))
-#  error "Dispatching is currently only supported on x86 and x86_64."
-#endif
+#if (defined(__x86_64__) || defined(__i386__) || defined(_M_IX86) || defined(_M_X64))
 
 /*! @cond Doxygen ignores this part */
 #ifndef XXH_HAS_INCLUDE
@@ -841,6 +839,7 @@ XXH3_128bits_update_dispatch(XXH_NOESCAPE XXH3_state_t* state, XXH_NOESCAPE cons
     return XXH_g_dispatch128.update(state, (const xxh_u8*)input, len);
 }
 
+#endif
 /*! @endcond */
 
 #if defined (__cplusplus)
