@@ -52,7 +52,11 @@
 extern "C" {
 #endif
 
-#if (defined(__x86_64__) || defined(__i386__) || defined(_M_IX86) || defined(_M_X64))
+#if defined(_MSC_VER) && defined(__clang__)
+#  define NO_DISPATCH
+#endif
+
+#if (defined(__x86_64__) || defined(__i386__) || defined(_M_IX86) || defined(_M_X64)) && !defined(NO_DISPATCH)
 
 /*!
  * @def XXH_X86DISPATCH_ALLOW_AVX
