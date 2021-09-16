@@ -52,11 +52,7 @@
 extern "C" {
 #endif
 
-#if defined(_MSC_VER) && defined(__clang__)
-#  define NO_DISPATCH
-#endif
-
-#if (defined(__x86_64__) || defined(__i386__) || defined(_M_IX86) || defined(_M_X64)) && !defined(NO_DISPATCH)
+#if (defined(__x86_64__) || defined(__i386__) || defined(_M_IX86) || defined(_M_X64))
 
 /*! @cond Doxygen ignores this part */
 #ifndef XXH_HAS_INCLUDE
@@ -171,6 +167,18 @@ extern "C" {
 #  endif
 #endif /* XXH_DISPATCH_AVX512 */
 
+/* clang-cl's intrinsic headers depend on the predefined macros coming from
+ * -march or -mfeature flags, which are not defined if we are targeting something
+ * without those features. Since we are deliberately doing dispatch for intrinsics
+ * we may not be able to execute on our primary target, we must define these here
+ * in order for the right intrinsics to get defined.
+ */
+#if defined(_MSC_VER) && defined(__clang__)
+#  define __AVX__
+#  define __AVX2__
+#  define __AVX512F__
+#endif
+
 /*!
  * @def XXH_TARGET_SSE2
  * @brief Allows a function to be compiled with SSE2 intrinsics.
@@ -185,7 +193,7 @@ extern "C" {
  * @brief Like @ref XXH_TARGET_SSE2, but for AVX512.
  *
  */
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__clang__)
 #  include <emmintrin.h> /* SSE2 */
 #  if XXH_DISPATCH_AVX2 || XXH_DISPATCH_AVX512
 #    include <immintrin.h> /* AVX2, AVX512F */
