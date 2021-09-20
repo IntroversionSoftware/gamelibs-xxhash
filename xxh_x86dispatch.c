@@ -167,9 +167,15 @@ extern "C" {
  * in order for the right intrinsics to get defined.
  */
 #if defined(_MSC_VER) && defined(__clang__)
+#ifndef __AVX__
 #  define __AVX__
+#endif
+#ifndef __AVX2__
 #  define __AVX2__
+#endif
+#ifndef __AVX512F__
 #  define __AVX512F__
+#endif
 #endif
 
 /*!
