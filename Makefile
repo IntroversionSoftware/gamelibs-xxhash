@@ -40,7 +40,7 @@ HEADERS_INST := $(patsubst %,$(includedir)/%,$(HEADERS))
 OBJECTS := $(patsubst %.c,$(OBJ_DIR)/%.o,$(SOURCES))
 
 CFLAGS ?= -O2
-CPPFLAGS += -I.
+CPPFLAGS += -I. -DXXH_DISPATCH_AVX512=0
 
 .PHONY: install
 
