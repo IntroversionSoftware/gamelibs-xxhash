@@ -1637,6 +1637,7 @@ XXH3_128bits_reset_withSecretandSeed(XXH3_state_t* statePtr,
 /* *************************************
 *  Includes & Memory related functions
 ***************************************/
+#if !defined(XXH_CUSTOM_MALLOC)
 #if defined(XXH_NO_STDLIB)
 
 /* When requesting to disable any mention of stdlib,
@@ -1672,6 +1673,7 @@ static XXH_MALLOCF void* XXH_malloc(size_t s) { return malloc(s); }
 static void XXH_free(void* p) { free(p); }
 
 #endif  /* XXH_NO_STDLIB */
+#endif
 
 #include <string.h>
 
