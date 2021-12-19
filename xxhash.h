@@ -2309,6 +2309,7 @@ XXH3_128bits_reset_withSecretandSeed(XXH_NOESCAPE XXH3_state_t* statePtr,
 /* *************************************
 *  Includes & Memory related functions
 ***************************************/
+#if !defined(XXH_CUSTOM_MALLOC)
 #if defined(XXH_NO_STREAM)
 /* nothing */
 #elif defined(XXH_NO_STDLIB)
@@ -2346,6 +2347,7 @@ static XXH_MALLOCF void* XXH_malloc(size_t s) { return malloc(s); }
 static void XXH_free(void* p) { free(p); }
 
 #endif  /* XXH_NO_STDLIB */
+#endif  /* !XXH_CUSTOM_MALLOC */
 
 #include <string.h>
 
