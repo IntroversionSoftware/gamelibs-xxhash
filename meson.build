@@ -1,4 +1,4 @@
-project('xxhash', 'cpp')
+project('xxhash', 'c')
 
 incdirs = ['.']
 libs = []
