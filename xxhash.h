@@ -6152,6 +6152,7 @@ XXH3_initCustomSecret_scalar(void* XXH_RESTRICT customSecret, xxh_u64 seed64)
 
 
 typedef void (*XXH3_f_accumulate)(xxh_u64* XXH_RESTRICT, const xxh_u8* XXH_RESTRICT, const xxh_u8* XXH_RESTRICT, size_t);
+typedef void (*XXH3_f_accumulate_512)(void *XXH_RESTRICT acc, const void *XXH_RESTRICT input, const void *XXH_RESTRICT secret);
 typedef void (*XXH3_f_scrambleAcc)(void* XXH_RESTRICT, const void*);
 typedef void (*XXH3_f_initCustomSecret)(void* XXH_RESTRICT, xxh_u64);
 
@@ -6234,6 +6235,7 @@ XXH3_hashLong_internal_loop(xxh_u64* XXH_RESTRICT acc,
                       const xxh_u8* XXH_RESTRICT input, size_t len,
                       const xxh_u8* XXH_RESTRICT secret, size_t secretSize,
                             XXH3_f_accumulate f_acc,
+                            XXH3_f_accumulate_512 f_acc512,
                             XXH3_f_scrambleAcc f_scramble)
 {
     size_t const nbStripesPerBlock = (secretSize - XXH_STRIPE_LEN) / XXH_SECRET_CONSUME_RATE;
@@ -6258,7 +6260,7 @@ XXH3_hashLong_internal_loop(xxh_u64* XXH_RESTRICT acc,
         /* last stripe */
         {   const xxh_u8* const p = input + len - XXH_STRIPE_LEN;
 #define XXH_SECRET_LASTACC_START 7  /* not aligned on 8, last secret is different from acc & scrambler */
-            XXH3_accumulate_512(acc, p, secret + secretSize - XXH_STRIPE_LEN - XXH_SECRET_LASTACC_START);
+            f_acc512(acc, p, secret + secretSize - XXH_STRIPE_LEN - XXH_SECRET_LASTACC_START);
     }   }
 }
 
@@ -6313,11 +6315,12 @@ XXH_FORCE_INLINE XXH64_hash_t
 XXH3_hashLong_64b_internal(const void* XXH_RESTRICT input, size_t len,
                            const void* XXH_RESTRICT secret, size_t secretSize,
                            XXH3_f_accumulate f_acc,
+                           XXH3_f_accumulate_512 f_acc512,
                            XXH3_f_scrambleAcc f_scramble)
 {
     XXH_ALIGN(XXH_ACC_ALIGN) xxh_u64 acc[XXH_ACC_NB] = XXH3_INIT_ACC;
 
-    XXH3_hashLong_internal_loop(acc, (const xxh_u8*)input, len, (const xxh_u8*)secret, secretSize, f_acc, f_scramble);
+    XXH3_hashLong_internal_loop(acc, (const xxh_u8*)input, len, (const xxh_u8*)secret, secretSize, f_acc, f_acc512, f_scramble);
 
     /* converge into final hash */
     XXH_STATIC_ASSERT(sizeof(acc) == 64);
@@ -6337,7 +6340,7 @@ XXH3_hashLong_64b_withSecret(const void* XXH_RESTRICT input, size_t len,
                              XXH64_hash_t seed64, const xxh_u8* XXH_RESTRICT secret, size_t secretLen)
 {
     (void)seed64;
-    return XXH3_hashLong_64b_internal(input, len, secret, secretLen, XXH3_accumulate, XXH3_scrambleAcc);
+    return XXH3_hashLong_64b_internal(input, len, secret, secretLen, XXH3_accumulate, XXH3_accumulate_512, XXH3_scrambleAcc);
 }
 
 /*
@@ -6351,7 +6354,7 @@ XXH3_hashLong_64b_default(const void* XXH_RESTRICT input, size_t len,
                           XXH64_hash_t seed64, const xxh_u8* XXH_RESTRICT secret, size_t secretLen)
 {
     (void)seed64; (void)secret; (void)secretLen;
-    return XXH3_hashLong_64b_internal(input, len, XXH3_kSecret, sizeof(XXH3_kSecret), XXH3_accumulate, XXH3_scrambleAcc);
+    return XXH3_hashLong_64b_internal(input, len, XXH3_kSecret, sizeof(XXH3_kSecret), XXH3_accumulate, XXH3_accumulate_512, XXH3_scrambleAcc);
 }
 
 /*
@@ -6369,6 +6372,7 @@ XXH_FORCE_INLINE XXH64_hash_t
 XXH3_hashLong_64b_withSeed_internal(const void* input, size_t len,
                                     XXH64_hash_t seed,
                                     XXH3_f_accumulate f_acc,
+                                    XXH3_f_accumulate_512 f_acc512,
                                     XXH3_f_scrambleAcc f_scramble,
                                     XXH3_f_initCustomSecret f_initSec)
 {
@@ -6376,12 +6380,12 @@ XXH3_hashLong_64b_withSeed_internal(const void* input, size_t len,
     if (seed == 0)
         return XXH3_hashLong_64b_internal(input, len,
                                           XXH3_kSecret, sizeof(XXH3_kSecret),
-                                          f_acc, f_scramble);
+                                          f_acc, f_acc512, f_scramble);
 #endif
     {   XXH_ALIGN(XXH_SEC_ALIGN) xxh_u8 secret[XXH_SECRET_DEFAULT_SIZE];
         f_initSec(secret, seed);
         return XXH3_hashLong_64b_internal(input, len, secret, sizeof(secret),
-                                          f_acc, f_scramble);
+                                          f_acc, f_acc512, f_scramble);
     }
 }
 
@@ -6394,7 +6398,7 @@ XXH3_hashLong_64b_withSeed(const void* XXH_RESTRICT input, size_t len,
 {
     (void)secret; (void)secretLen;
     return XXH3_hashLong_64b_withSeed_internal(input, len, seed,
-                XXH3_accumulate, XXH3_scrambleAcc, XXH3_initCustomSecret);
+                XXH3_accumulate, XXH3_accumulate_512, XXH3_scrambleAcc, XXH3_initCustomSecret);
 }
 
 
@@ -7148,11 +7152,12 @@ XXH_FORCE_INLINE XXH128_hash_t
 XXH3_hashLong_128b_internal(const void* XXH_RESTRICT input, size_t len,
                             const xxh_u8* XXH_RESTRICT secret, size_t secretSize,
                             XXH3_f_accumulate f_acc,
+                            XXH3_f_accumulate_512 f_acc512,
                             XXH3_f_scrambleAcc f_scramble)
 {
     XXH_ALIGN(XXH_ACC_ALIGN) xxh_u64 acc[XXH_ACC_NB] = XXH3_INIT_ACC;
 
-    XXH3_hashLong_internal_loop(acc, (const xxh_u8*)input, len, secret, secretSize, f_acc, f_scramble);
+    XXH3_hashLong_internal_loop(acc, (const xxh_u8*)input, len, secret, secretSize, f_acc, f_acc512, f_scramble);
 
     /* converge into final hash */
     XXH_STATIC_ASSERT(sizeof(acc) == 64);
@@ -7170,7 +7175,7 @@ XXH3_hashLong_128b_default(const void* XXH_RESTRICT input, size_t len,
 {
     (void)seed64; (void)secret; (void)secretLen;
     return XXH3_hashLong_128b_internal(input, len, XXH3_kSecret, sizeof(XXH3_kSecret),
-                                       XXH3_accumulate, XXH3_scrambleAcc);
+                                       XXH3_accumulate, XXH3_accumulate_512, XXH3_scrambleAcc);
 }
 
 /*
@@ -7187,24 +7192,25 @@ XXH3_hashLong_128b_withSecret(const void* XXH_RESTRICT input, size_t len,
 {
     (void)seed64;
     return XXH3_hashLong_128b_internal(input, len, (const xxh_u8*)secret, secretLen,
-                                       XXH3_accumulate, XXH3_scrambleAcc);
+                                       XXH3_accumulate, XXH3_accumulate_512, XXH3_scrambleAcc);
 }
 
 XXH_FORCE_INLINE XXH128_hash_t
 XXH3_hashLong_128b_withSeed_internal(const void* XXH_RESTRICT input, size_t len,
                                 XXH64_hash_t seed64,
                                 XXH3_f_accumulate f_acc,
+                                XXH3_f_accumulate_512 f_acc512,
                                 XXH3_f_scrambleAcc f_scramble,
                                 XXH3_f_initCustomSecret f_initSec)
 {
     if (seed64 == 0)
         return XXH3_hashLong_128b_internal(input, len,
                                            XXH3_kSecret, sizeof(XXH3_kSecret),
-                                           f_acc, f_scramble);
+                                           f_acc, f_acc512, f_scramble);
     {   XXH_ALIGN(XXH_SEC_ALIGN) xxh_u8 secret[XXH_SECRET_DEFAULT_SIZE];
         f_initSec(secret, seed64);
         return XXH3_hashLong_128b_internal(input, len, (const xxh_u8*)secret, sizeof(secret),
-                                           f_acc, f_scramble);
+                                           f_acc, f_acc512, f_scramble);
     }
 }
 
@@ -7217,7 +7223,7 @@ XXH3_hashLong_128b_withSeed(const void* input, size_t len,
 {
     (void)secret; (void)secretLen;
     return XXH3_hashLong_128b_withSeed_internal(input, len, seed64,
-                XXH3_accumulate, XXH3_scrambleAcc, XXH3_initCustomSecret);
+                XXH3_accumulate, XXH3_accumulate_512, XXH3_scrambleAcc, XXH3_initCustomSecret);
 }
 
 typedef XXH128_hash_t (*XXH3_hashLong128_f)(const void* XXH_RESTRICT, size_t,
