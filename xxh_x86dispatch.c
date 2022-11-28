@@ -493,7 +493,8 @@ XXHL64_default_##suffix(XXH_NOESCAPE const void* XXH_RESTRICT input,          \
 {                                                                             \
     return XXH3_hashLong_64b_internal(                                        \
                input, len, XXH3_kSecret, sizeof(XXH3_kSecret),                \
-               XXH3_accumulate_##suffix, XXH3_scrambleAcc_##suffix            \
+               XXH3_accumulate_##suffix, XXH3_accumulate_512_##suffix,        \
+               XXH3_scrambleAcc_##suffix                                      \
     );                                                                        \
 }                                                                             \
                                                                               \
@@ -505,7 +506,8 @@ XXHL64_seed_##suffix(XXH_NOESCAPE const void* XXH_RESTRICT input, size_t len, \
 {                                                                             \
     return XXH3_hashLong_64b_withSeed_internal(                               \
                     input, len, seed, XXH3_accumulate_##suffix,               \
-                    XXH3_scrambleAcc_##suffix, XXH3_initCustomSecret_##suffix \
+                    XXH3_accumulate_512_##suffix, XXH3_scrambleAcc_##suffix,  \
+                    XXH3_initCustomSecret_##suffix                            \
     );                                                                        \
 }                                                                             \
                                                                               \
@@ -518,7 +520,8 @@ XXHL64_secret_##suffix(XXH_NOESCAPE const void* XXH_RESTRICT input,           \
 {                                                                             \
     return XXH3_hashLong_64b_internal(                                        \
                     input, len, secret, secretLen,                            \
-                    XXH3_accumulate_##suffix, XXH3_scrambleAcc_##suffix       \
+                    XXH3_accumulate_##suffix, XXH3_accumulate_512_##suffix,   \
+                    XXH3_scrambleAcc_##suffix                                 \
     );                                                                        \
 }                                                                             \
                                                                               \
@@ -540,7 +543,8 @@ XXHL128_default_##suffix(XXH_NOESCAPE  const void* XXH_RESTRICT input,        \
 {                                                                             \
     return XXH3_hashLong_128b_internal(                                       \
                     input, len, XXH3_kSecret, sizeof(XXH3_kSecret),           \
-                    XXH3_accumulate_##suffix, XXH3_scrambleAcc_##suffix       \
+                    XXH3_accumulate_##suffix, XXH3_accumulate_512_##suffix,   \
+                    XXH3_scrambleAcc_##suffix                                 \
     );                                                                        \
 }                                                                             \
                                                                               \
@@ -554,7 +558,8 @@ XXHL128_secret_##suffix(XXH_NOESCAPE const void* XXH_RESTRICT input,          \
 {                                                                             \
     return XXH3_hashLong_128b_internal(                                       \
                     input, len, (const xxh_u8*)secret, secretLen,             \
-                    XXH3_accumulate_##suffix, XXH3_scrambleAcc_##suffix);     \
+                    XXH3_accumulate_##suffix, XXH3_accumulate_512_##suffix,   \
+                    XXH3_scrambleAcc_##suffix);                               \
 }                                                                             \
                                                                               \
 /* ===   XXH128 Seeded variants   === */                                      \
@@ -564,7 +569,8 @@ XXHL128_seed_##suffix(XXH_NOESCAPE const void* XXH_RESTRICT input, size_t len,\
                       XXH64_hash_t seed)                                      \
 {                                                                             \
     return XXH3_hashLong_128b_withSeed_internal(input, len, seed,             \
-                    XXH3_accumulate_##suffix, XXH3_scrambleAcc_##suffix,      \
+                    XXH3_accumulate_##suffix, XXH3_accumulate_512_##suffix,   \
+                    XXH3_scrambleAcc_##suffix,                                \
                     XXH3_initCustomSecret_##suffix);                          \
 }
 
