@@ -203,6 +203,7 @@ extern "C" {
 #endif
 #include <assert.h>
 
+#define XXH_VECTOR XXH_ABORT
 #define XXH_INLINE_ALL
 #define XXH_X86DISPATCH
 #include "xxhash.h"

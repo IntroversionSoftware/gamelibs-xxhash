@@ -3134,6 +3134,7 @@ enum XXH_VECTOR_TYPE /* fake enum */ {
     XXH_NEON   = 4,  /*!< NEON for most ARMv7-A and all AArch64 */
     XXH_VSX    = 5,  /*!< VSX and ZVector for POWER8/z13 (64-bit) */
     XXH_SVE    = 6,  /*!< SVE for some ARMv8-A and ARMv9-A */
+    XXH_ABORT  = 7,
 };
 /*!
  * @ingroup tuning
@@ -3156,6 +3157,7 @@ enum XXH_VECTOR_TYPE /* fake enum */ {
 #  define XXH_NEON   4
 #  define XXH_VSX    5
 #  define XXH_SVE    6
+#  define XXH_ABORT  7
 #endif
 
 #ifndef XXH_VECTOR    /* can be defined on command line */
@@ -3200,7 +3202,7 @@ enum XXH_VECTOR_TYPE /* fake enum */ {
  * for compatibility with aligned vector loads, which are usually faster.
  */
 #ifndef XXH_ACC_ALIGN
-#  if defined(XXH_X86DISPATCH)
+#  if defined(XXH_X86DISPATCH) || XXH_VECTOR == XXH_ABORT
 #     define XXH_ACC_ALIGN 64  /* for compatibility with avx512 */
 #  elif XXH_VECTOR == XXH_SCALAR  /* scalar */
 #     define XXH_ACC_ALIGN 8
@@ -5000,6 +5002,36 @@ XXH3_initCustomSecret_scalar(void* XXH_RESTRICT customSecret, xxh_u64 seed64)
 }
 
 
+XXH_FORCE_INLINE void
+XXH3_accumulate_512_abort(void* XXH_RESTRICT acc,
+                          const void* XXH_RESTRICT input,
+                          const void* XXH_RESTRICT secret)
+{
+	abort();
+}
+
+XXH_FORCE_INLINE void
+XXH3_accumulate_abort(xxh_u64* XXH_RESTRICT acc,
+                      const xxh_u8* XXH_RESTRICT input,
+                      const xxh_u8* XXH_RESTRICT secret,
+                      size_t nbStripes)
+{
+	abort();
+}
+
+XXH_FORCE_INLINE void
+XXH3_scrambleAcc_abort(void* XXH_RESTRICT acc, const void* XXH_RESTRICT secret)
+{
+	abort();
+}
+
+XXH_FORCE_INLINE void
+XXH3_initCustomSecret_abort(void* XXH_RESTRICT customSecret, xxh_u64 seed64)
+{
+	abort();
+}
+
+
 typedef void (*XXH3_f_accumulate)(xxh_u64* XXH_RESTRICT, const xxh_u8* XXH_RESTRICT, const xxh_u8* XXH_RESTRICT, size_t);
 typedef void (*XXH3_f_scrambleAcc)(void* XXH_RESTRICT, const void*);
 typedef void (*XXH3_f_initCustomSecret)(void* XXH_RESTRICT, xxh_u64);
@@ -5045,6 +5077,13 @@ typedef void (*XXH3_f_initCustomSecret)(void* XXH_RESTRICT, xxh_u64);
 #define XXH3_accumulate     XXH3_accumulate_sve
 #define XXH3_scrambleAcc    XXH3_scrambleAcc_scalar
 #define XXH3_initCustomSecret XXH3_initCustomSecret_scalar
+
+#elif (XXH_VECTOR == XXH_ABORT)
+
+#define XXH3_accumulate_512 XXH3_accumulate_512_abort
+#define XXH3_accumulate     XXH3_accumulate_abort
+#define XXH3_scrambleAcc    XXH3_scrambleAcc_abort
+#define XXH3_initCustomSecret XXH3_initCustomSecret_abort
 
 #else /* scalar */
 
