@@ -2045,13 +2045,13 @@ static int XXH_isLittleEndian(void)
 #  include <stddef.h>
 #  define XXH_UNREACHABLE() unreachable()
 
+#elif XXH_HAS_BUILTIN(__builtin_unreachable)
+#  define XXH_UNREACHABLE() __builtin_unreachable()
+
 #elif defined(__cplusplus) && (__cplusplus > 202002L)
 /* C++23 and future versions have std::unreachable() */
 #  include <utility> /* std::unreachable() */
 #  define XXH_UNREACHABLE() std::unreachable()
-
-#elif XXH_HAS_BUILTIN(__builtin_unreachable)
-#  define XXH_UNREACHABLE() __builtin_unreachable()
 
 #elif defined(_MSC_VER)
 #  define XXH_UNREACHABLE() __assume(0)
