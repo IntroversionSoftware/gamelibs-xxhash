@@ -32,6 +32,8 @@
  *   - xxHash source repository: https://github.com/Cyan4973/xxHash
  */
 
+#define XXH_X86DISPATCH_ALLOW_AVX 1
+
 
 /*!
  * @file xxh_x86dispatch.c
