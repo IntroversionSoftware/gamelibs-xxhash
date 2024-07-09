@@ -10,6 +10,7 @@ if target_machine.cpu_family() == 'x86' or target_machine.cpu_family() == 'x86_6
 
   sources = [
 	  'xxh_x86dispatch.c',
+	  'xxhash.c',
   ]
 
   lib = static_library(

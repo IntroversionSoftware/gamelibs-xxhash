@@ -34,7 +34,7 @@ libdir := $(prefix)/lib
 includedir := $(prefix)/include
 
 HEADERS = xxh_x86dispatch.h xxhash.h
-SOURCES = xxh_x86dispatch.c
+SOURCES = xxh_x86dispatch.c xxhash.c
 
 HEADERS_INST := $(patsubst %,$(includedir)/%,$(HEADERS))
 OBJECTS := $(patsubst %.c,$(OBJ_DIR)/%.o,$(SOURCES))
