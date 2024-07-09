@@ -48,6 +48,8 @@
 #if defined(USE_JEMALLOC) || defined(USE_MIMALLOC)
 #  define XXH_CUSTOM_MALLOC
 
+#  include <stdlib.h>
+
 #  ifndef CDECL
 #    ifdef _WIN32
 #      define CDECL __cdecl
