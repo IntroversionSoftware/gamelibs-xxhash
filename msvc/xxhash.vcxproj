@@ -58,11 +58,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\xxh_x86dispatch.c">
-      <ExcludedFromBuild Condition="$(Platform)=='ARM64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Platform)'!='Win32' and '$(Platform)'!='x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\xxhash.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\xxhash.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\xxh_x86dispatch.h" />
