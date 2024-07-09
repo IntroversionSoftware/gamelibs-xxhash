@@ -36,6 +36,43 @@
  * xxhash.c instantiates functions defined in xxhash.h
  */
 
+
+/* If we're using jemalloc or mimalloc, we need to provide our own malloc/free
+ * functions to xxhash, or else we won't use the same heaps or get the
+ * advantages of memory leak tracking, etc.
+ */
+#if defined(USE_JEMALLOC) || defined(USE_MIMALLOC)
+#  define XXH_CUSTOM_MALLOC
+
+#  ifndef CDECL
+#    ifdef _WIN32
+#      define CDECL __cdecl
+#    else
+#      define CDECL
+#    endif
+#  endif
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif
+	extern void *CDECL internal_alloc(size_t count);
+	extern void CDECL internal_free(void *s);
+
+	inline void *XXH_malloc(size_t s) { return internal_alloc(s); }
+	inline void XXH_free(void *s) { internal_free(s); }
+#  ifdef __cplusplus
+}
+#  endif
+
+#endif
+
+/* Ensure that we have a vectorization target */
+#if defined(_M_ARM64) || defined(_M_ARM) || defined(__aarch64__) || defined(__arm__)
+#  define XXH_VECTOR XXH_NEON
+#elif defined(__SSE2__) || defined(_M_X64) || defined(_M_IX86) || defined(__i386__) || defined(__x86_64__)
+#  define XXH_VECTOR XXH_SSE2
+#endif
+
 #define XXH_STATIC_LINKING_ONLY /* access advanced declarations */
 #define XXH_IMPLEMENTATION      /* access definitions */
 
