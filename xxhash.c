@@ -60,8 +60,8 @@ extern "C" {
 	extern void *CDECL internal_alloc(size_t count);
 	extern void CDECL internal_free(void *s);
 
-	inline void *XXH_malloc(size_t s) { return internal_alloc(s); }
-	inline void XXH_free(void *s) { internal_free(s); }
+	static void *XXH_malloc(size_t s) { return internal_alloc(s); }
+	static void XXH_free(void *s) { internal_free(s); }
 #  ifdef __cplusplus
 }
 #  endif
