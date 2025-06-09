@@ -58,6 +58,7 @@ endif()
 
 option(BUILD_SHARED_LIBS "Build shared library" ON)
 option(XXHASH_BUILD_XXHSUM "Build the xxhsum binary" ON)
+option(XXHASH_DISPATCH "Enable Dispatch Mode" ON)
 
 # If XXHASH is being bundled in another project, we don't want to
 # install anything.  However, we want to let people override this, so
@@ -84,7 +85,7 @@ CMAKE_HOST_SYSTEM_INFORMATION(RESULT PLATFORM QUERY OS_PLATFORM)
 message(STATUS "Architecture: ${PLATFORM}")
 
 # libxxhash
-if((DEFINED DISPATCH) AND (DEFINED PLATFORM))
+if((DEFINED XXHASH_DISPATCH) AND (DEFINED PLATFORM))
   # Only support DISPATCH option on x86_64.
   if(("${PLATFORM}" STREQUAL "x86_64") OR ("${PLATFORM}" STREQUAL "AMD64"))
     set(XXHSUM_DISPATCH ON)
@@ -151,7 +152,7 @@ if(NOT XXHASH_BUNDLED_MODE)
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
   install(FILES "${XXHASH_DIR}/xxh3.h"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
-  if(DISPATCH)
+  if(XXHASH_DISPATCH)
     install(FILES "${XXHASH_DIR}/xxh_x86dispatch.h"
       DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
   endif()
