@@ -71,7 +71,9 @@ extern "C" {
 /* Ensure that we have a vectorization target */
 #if defined(_M_ARM64) || defined(_M_ARM) || defined(__aarch64__) || defined(__arm__)
 #  define XXH_VECTOR XXH_NEON
-#elif defined(__SSE2__) || defined(_M_X64) || defined(_M_IX86) || defined(__i386__) || defined(__x86_64__)
+#elif defined(__AVX2__) ||defined(_M_X64) || defined(__x86_64__)
+#  define XXH_VECTOR XXH_AVX2
+#elif defined(__SSE2__) || defined(_M_IX86) || defined(__i386__)
 #  define XXH_VECTOR XXH_SSE2
 #endif
 
