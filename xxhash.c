@@ -73,10 +73,12 @@ extern "C" {
 #endif
 
 /* Ensure that we have a vectorization target */
+#ifndef XXH_VECTOR
 #if defined(_M_ARM64) || defined(_M_ARM) || defined(__aarch64__) || defined(__arm__)
 #  define XXH_VECTOR XXH_NEON
 #elif defined(__SSE2__) || defined(_M_X64) || defined(_M_IX86) || defined(__i386__) || defined(__x86_64__)
 #  define XXH_VECTOR XXH_SSE2
+#endif
 #endif
 
 #define XXH_STATIC_LINKING_ONLY /* access advanced declarations */
