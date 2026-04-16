@@ -36,6 +36,10 @@
  * xxhash.c instantiates functions defined in xxhash.h
  */
 
+#if defined(__AVX2__) ||defined(_M_X64) || defined(__x86_64__) || \
+    defined(__SSE2__) || defined(_M_IX86) || defined(__i386__)
+#include <immintrin.h>
+#endif
 
 /* If we're using jemalloc or mimalloc, we need to provide our own malloc/free
  * functions to xxhash, or else we won't use the same heaps or get the
